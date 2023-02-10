@@ -1,6 +1,6 @@
 [//]: # (For code from files, run `npx embedme README.md`)
 
-[//]: # (For TOC go to http://ecotrust-canada.github.io/markdown-toc/ and paste the result here.)
+[//]: # (For TOC go to https://luciopaiva.com/markdown-toc/ and paste the result here.)
 
 # Table of contents
 
