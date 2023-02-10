@@ -2,30 +2,31 @@
 
 [//]: # (For TOC go to https://luciopaiva.com/markdown-toc/ and paste the result here.)
 
+# Training Algorithms for Mixtures of Normalizing Flows
+
 # Table of contents
 
-- [Important Warning](#important-warning)
-- [Install requirements](#install-requirements)
-- [Training algorithms for probabilistic distributions - sample code](#training-algorithms-for-probabilistic-distributions---sample-code)
-  - [Normal distribution](#normal-distribution)
-    - [via tfd.Distribution.experimental_fit](#via-tfddistributionexperimental_fit)
-    - [via our code: gradient descent](#via-our-code-gradient-descent)
-  - [Mixture of normal distributions](#mixture-of-normal-distributions)
-    - [via our code: gradient descent](#via-our-code-gradient-descent)
-    - [via our code: hard EM](#via-our-code-hard-em)
-    - [via our code: soft EM](#via-our-code-soft-em)
-    - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
-  - [Mixture of normalizing flows](#mixture-of-normalizing-flows)
-    - [via our code: gradient descent](#via-our-code-gradient-descent)
-    - [via our code: hard EM](#via-our-code-hard-em)
-    - [via our code: soft EM](#via-our-code-soft-em)
-    - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
-    - [via our code: gradient descent (create the `distribution` object using our own classes)](#via-our-code-gradient-descent-create-the-distribution-object-using-our-own-classes)
-- [Mixture of normalizing flows: How to run the scripts](#mixture-of-normalizing-flows-how-to-run-the-scripts)
-  - [Training](#training)
-  - [Evaluation](#evaluation)
-
-# Training Algorithms for Mixtures of Normalizing Flows
+- [Training Algorithms for Mixtures of Normalizing Flows](#training-algorithms-for-mixtures-of-normalizing-flows)
+  - [Important Warning](#important-warning)
+  - [Install requirements](#install-requirements)
+  - [Training algorithms for probabilistic distributions: sample code](#training-algorithms-for-probabilistic-distributions-sample-code)
+    - [Normal distribution](#normal-distribution)
+      - [via tfd.Distribution.experimental_fit](#via-tfddistributionexperimental_fit)
+      - [via our code: gradient descent](#via-our-code-gradient-descent)
+    - [Mixture of normal distributions](#mixture-of-normal-distributions)
+      - [via our code: gradient descent](#via-our-code-gradient-descent)
+      - [via our code: hard EM](#via-our-code-hard-em)
+      - [via our code: soft EM](#via-our-code-soft-em)
+      - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
+    - [Mixture of normalizing flows](#mixture-of-normalizing-flows)
+      - [via our code: gradient descent](#via-our-code-gradient-descent)
+      - [via our code: hard EM](#via-our-code-hard-em)
+      - [via our code: soft EM](#via-our-code-soft-em)
+      - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
+      - [via our code: gradient descent (create the `distribution` object using our own classes)](#via-our-code-gradient-descent-create-the-distribution-object-using-our-own-classes)
+  - [Mixture of normalizing flows: How to run the scripts](#mixture-of-normalizing-flows-how-to-run-the-scripts)
+    - [Training](#training)
+    - [Evaluation](#evaluation)
 
 ## Important Warning
 
