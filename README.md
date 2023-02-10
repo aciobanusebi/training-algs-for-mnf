@@ -4,7 +4,7 @@
 
 # Training Algorithms for Mixtures of Normalizing Flows
 
-- [Warning!](#warning-)
+- [Important Warning](#important-warning)
 - [Install requirements](#install-requirements)
 - [Training algorithms for probabilistic distributions: sample code](#training-algorithms-for-probabilistic-distributions--sample-code)
   * [Normal distribution](#normal-distribution)
@@ -28,7 +28,7 @@
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with
 markdown-toc</a></i></small>
 
-## Warning!
+## Important Warning
 
 For hard EM and soft EM, you MUST NOT call `.shuffle(...)` on the dataset (tf.data.Dataset) unless you
 set `reshuffle_each_iteration` to False, i.e. you can only call `.shuffle(..., reshuffle_each_iteration=False)`. **This
