@@ -1,0 +1,10 @@
+h5py==3.8.0
+matplotlib==3.6.3
+numpy==1.24.1
+pandas==1.5.3
+scikit_learn==1.2.1
+scipy==1.10.0
+tensorflow==2.10.1
+tensorflow_probability==0.18.0
+tqdm==4.64.1
+jupyter
