@@ -2,6 +2,8 @@
 
 # Training Algorithms for Mixtures of Normalizing Flows
 
+{:toc}
+
 ## Warning!
 
 For hard EM and soft EM, you MUST NOT call `.shuffle(...)` on the dataset (tf.data.Dataset) unless you
