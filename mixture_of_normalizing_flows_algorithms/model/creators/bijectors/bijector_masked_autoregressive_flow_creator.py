@@ -5,7 +5,8 @@ tfb = tfp.bijectors
 
 
 class BijectorMaskedAutoregressiveFlowCreator:
-    def __init__(self, hidden_units, activation="tanh"):
+    def __init__(self, dtype, hidden_units, activation="tanh"):
+        self.dtype = dtype
         self.hidden_units = hidden_units
         self.activation = activation
 
@@ -13,5 +14,6 @@ class BijectorMaskedAutoregressiveFlowCreator:
         return tfb.MaskedAutoregressiveFlow(
             tfb.AutoregressiveNetwork(params=2,
                                       hidden_units=self.hidden_units,
-                                      activation=self.activation)
+                                      activation=self.activation,
+                                      dtype=self.dtype)
         )

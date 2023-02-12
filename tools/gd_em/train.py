@@ -92,6 +92,7 @@ if args.suppress_warnings:
 from tensorflow import keras
 
 input_data, _ = getattr(Datasets, args.dataset_name)()
+input_data = np.array(input_data, dtype=args.dtype)
 input_data_dimensionality = input_data.shape[1]
 number_of_clusters = len(np.unique(_))
 
@@ -135,7 +136,8 @@ mnf = MixtureOfNormalizingFlowsCreator(
             ),
             bijector_creator=BijectorMaskedAutoregressiveFlowCreator(
                 hidden_units=args.maf_hidden_units,
-                activation=args.maf_activation
+                activation=args.maf_activation,
+                dtype=args.dtype
             )
         )
         for _ in range(number_of_clusters)],

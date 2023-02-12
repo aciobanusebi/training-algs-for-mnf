@@ -17,7 +17,7 @@ from mixture_of_normalizing_flows_algorithms.trainers.variational_mixture_traine
 tfkl = keras.layers
 
 from mixture_of_normalizing_flows_algorithms.data.datasets import Datasets
-from mixture_of_normalizing_flows_algorithms.evaluate.clustering_evaluator import ClusterEvaluator
+from mixture_of_normalizing_flows_algorithms.evaluate.clustering_evaluator import ClusteringEvaluator
 from mixture_of_normalizing_flows_algorithms.model.creators.base_distributions.base_multivariate_normal_diag_creator import \
     BaseMultivariateNormalDiagCreator
 from mixture_of_normalizing_flows_algorithms.model.creators.bijectors.bijector_masked_autoregressive_flow_creator import \
@@ -49,10 +49,6 @@ print(args)
 output_directory = f"{args.output_directory}/{args.dataset_name}/{args.algorithm}/evaluate"
 Path(output_directory).mkdir(parents=True, exist_ok=True)
 
-input_data, output_data = getattr(Datasets, args.dataset_name)()
-input_data_dimensionality = input_data.shape[1]
-number_of_clusters = len(np.unique(output_data))
-
 checkpoint_filepath = f'{args.output_directory}/{args.dataset_name}/{args.algorithm}/train/best_model/'
 checkpoint_filepath_encoder = f'{args.output_directory}/{args.dataset_name}/{args.algorithm}/train/best_encoder/'
 
@@ -60,6 +56,11 @@ train_args_filepath = f'{args.output_directory}/{args.dataset_name}/{args.algori
 
 with open(train_args_filepath, 'rb') as file:
     train_args = pickle.load(file)
+
+input_data, output_data = getattr(Datasets, args.dataset_name)()
+input_data = np.array(input_data, dtype=train_args.dtype)
+input_data_dimensionality = input_data.shape[1]
+number_of_clusters = len(np.unique(output_data))
 
 tf.random.set_seed(train_args.seed)
 random.seed(train_args.seed)
@@ -88,6 +89,7 @@ mnf = MixtureOfNormalizingFlowsCreator(
                 dtype=train_args.dtype
             ),
             bijector_creator=BijectorMaskedAutoregressiveFlowCreator(
+                dtype=train_args.dtype,
                 hidden_units=train_args.maf_hidden_units,
                 activation=train_args.maf_activation
             )
@@ -123,7 +125,7 @@ nll = None
 if args.algorithm == "gd_variational":
     nll = DistributionTrainer(mnf)._compute_loss(batched_dataset_train, None)
 
-computed_metrics = ClusterEvaluator.evaluate(y_true=output_data, y_pred=predicted_clustering)
+computed_metrics = ClusteringEvaluator.evaluate(y_true=output_data, y_pred=predicted_clustering)
 computed_metrics["loss"] = loss
 if args.algorithm == "gd_variational":
     computed_metrics["nll"] = nll
@@ -131,9 +133,9 @@ with open(f"{output_directory}/metrics.json", 'w') as outfile:
     json.dump(computed_metrics, outfile)
 
 if input_data_dimensionality == 2:
-    ClusterEvaluator.plot_density_2d(input_data, mnf, log=False)
+    ClusteringEvaluator.plot_density_2d(input_data, mnf, log=False)
     plt.savefig(f'{output_directory}/plot_density_2d.png')
-    ClusterEvaluator.plot_decision_boundary_2d(
+    ClusteringEvaluator.plot_decision_boundary_2d(
         lambda x: predictor_object.predict(x).numpy(),
         input_data,
         output_data

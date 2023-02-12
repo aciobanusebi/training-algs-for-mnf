@@ -25,6 +25,7 @@ distribution = MixtureOfNormalizingFlowsCreator(
                 scale=1.0
             ),
             bijector_creator=BijectorMaskedAutoregressiveFlowCreator(
+                dtype="float32",
                 hidden_units=[5],
                 activation=None
             )

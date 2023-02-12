@@ -84,10 +84,10 @@ class Datasets:
         return samples, real_labels
 
     @staticmethod
-    def usps():
+    def usps(path="data/usps.h5"):
+        # from https://www.kaggle.com/datasets/bistaumanga/usps-dataset
         import numpy as np
         import h5py
-        path = "data/usps.h5"
         with h5py.File(path, 'r') as hf:
             train = hf.get('train')
             X_tr = train.get('data')[:]
@@ -129,11 +129,11 @@ class Datasets:
         return data, labels
 
     @staticmethod
-    def smile():
+    def smile(path="data/smile.csv"):
         # from https://profs.info.uaic.ro/~pmihaela/DM/datasets%20clustering/
         import numpy as np
         import pandas
-        data = pandas.read_csv("data/smile.csv").to_numpy().astype(np.float32)
+        data = pandas.read_csv(path).to_numpy().astype(np.float32)
         samples = data[:, :2]
         labels = data[:, 2]
         samples = Datasets.__rescale_columns(samples)
@@ -142,9 +142,9 @@ class Datasets:
     @staticmethod
     def moons():
         import numpy as np
-        import sklearn
+        from sklearn.datasets import make_moons
         np.random.seed(1)
-        data = sklearn.datasets.make_moons(1000, noise=0.1)
+        data = make_moons(1000, noise=0.1)
         samples = data[0].astype(np.float32)
         labels = data[1]
         samples = Datasets.__rescale_columns(samples)
@@ -156,8 +156,8 @@ class Datasets:
     def circles():
         import numpy as np
         np.random.seed(1)
-        import sklearn
-        data = sklearn.datasets.make_circles(1000, noise=0.01)
+        from sklearn.datasets import make_circles
+        data = make_circles(1000, noise=0.01)
         samples = data[0].astype(np.float32)
         labels = data[1]
         samples = Datasets.__rescale_columns(samples)

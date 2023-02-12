@@ -5,3 +5,4 @@
 /venv
 /main_logs_evaluate.txt
 /main_logs_train.txt
+/process_results

@@ -8,7 +8,7 @@ from sklearn.metrics.cluster import contingency_matrix
 from sklearn.metrics.cluster import normalized_mutual_info_score
 
 
-class ClusterEvaluator:
+class ClusteringEvaluator:
     @staticmethod
     def __purity_score(y_true, y_pred):  # from https://stackoverflow.com/a/51672699/7947996
         # compute contingency matrix (also called confusion matrix)
@@ -31,7 +31,7 @@ class ClusterEvaluator:
         cm = confusion_matrix(true_row_labels, predicted_row_labels)
         indexes = linear_assignment(_make_cost_m(cm))
         total = 0
-        for row, column in indexes:
+        for row, column in zip(*indexes):
             value = cm[row][column]
             total += value
 
@@ -40,12 +40,13 @@ class ClusterEvaluator:
     @staticmethod
     def evaluate(y_true, y_pred):
         return {
-            "purity_score": ClusterEvaluator.__purity_score(y_true, y_pred),
+            "purity_score": ClusteringEvaluator.__purity_score(y_true, y_pred),
             "adjusted_rand_score": adjusted_rand_score(y_true, y_pred),
             "normalized_mutual_info_score": normalized_mutual_info_score(y_true, y_pred),
-            "accuracy": ClusterEvaluator.__accuracy(y_true, y_pred),
+            "accuracy": ClusteringEvaluator.__accuracy(y_true, y_pred),
             "contingency_matrix": contingency_matrix(y_true, y_pred).tolist(),
-            "normalized_contingency_matrix": ClusterEvaluator.__normalized_contingency_matrix(y_true, y_pred).tolist()
+            "normalized_contingency_matrix": ClusteringEvaluator.__normalized_contingency_matrix(y_true,
+                                                                                                 y_pred).tolist()
         }
 
     @staticmethod
