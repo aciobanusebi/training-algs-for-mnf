@@ -3,7 +3,7 @@ import os
 algorithms = ["gd", "em_soft", "em_hard", "gd_variational"]
 
 datasets = {
-    "toy": [],  # ["pinwheel", "moons", "circles", "two_banana"],
+    "toy": ["pinwheel", "moons", "circles", "two_banana"],
     "image": ["mnist5", "mnist"]
 }
 maf_hidden_units = {
