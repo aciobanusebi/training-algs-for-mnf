@@ -6,8 +6,6 @@
 
 # Table of contents
 
-# Table of contents
-
 - [Important Warning](#important-warning)
 - [Install requirements](#install-requirements)
 - [Training algorithms for probabilistic distributions: sample code](#training-algorithms-for-probabilistic-distributions-sample-code)
