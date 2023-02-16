@@ -3,16 +3,21 @@ import os
 algorithms = ["gd", "em_soft", "em_hard", "gd_variational"]
 
 datasets = {
-    "toy": ["two_banana", "smile", "moons", "circles", "pinwheel"],
-    "image": ["mnist", "mnist5", "fmnist", "cifar10"]
+    "toy": [],  # ["pinwheel", "moons", "circles", "two_banana"],
+    "image": ["mnist5", "mnist"]
 }
 maf_hidden_units = {
-    "toy": 10,
-    "image": 1024
+    "toy": [8],
+    "image": [8]
 }
+maf_number_of_blocks = 2
 encoder_hidden_units = {
-    "toy": 10,
-    "image": 1024
+    "toy": [10, 10],
+    "image": [10, 10]
+}
+encoder_activations = {
+    "toy": ["relu", "relu"],
+    "image": ["relu", "relu"]
 }
 epochs = {
     "toy": {
@@ -32,7 +37,7 @@ m_step_epochs = {
     "toy": 10,
     "image": 4
 }
-seeds = list(range(10))
+seeds = list(range(5))
 
 dataset_types = ["toy", "image"]
 for dataset_type in dataset_types:
@@ -42,16 +47,17 @@ for dataset_type in dataset_types:
             for algorithm in algorithms:
                 command = f"python -m tools.gd_em.train " \
                           f"--algorithm {algorithm} " \
-                          f"--maf_hidden_units {maf_hidden_units[dataset_type]} " \
-                          f"--maf_activation tanh " \
+                          f"--maf_hidden_units {' '.join(map(str, maf_hidden_units[dataset_type]))} " \
+                          f"--maf_activation relu " \
+                          f"--maf_number_of_blocks {maf_number_of_blocks} " \
                           f"--prior_trainable True " \
-                          f"--encoder_hidden_units {encoder_hidden_units[dataset_type]} " \
-                          f"--encoder_activations relu " \
-                          f"--learning_rate 0.001 " \
+                          f"--encoder_hidden_units {' '.join(map(str, encoder_hidden_units[dataset_type]))} " \
+                          f"--encoder_activations {' '.join(encoder_activations[dataset_type])} " \
+                          f"--learning_rate 0.0001 " \
                           f"--epochs {epochs[dataset_type][algorithm]} " \
                           f"--m_step_epochs {m_step_epochs[dataset_type]} " \
                           f"--dataset_name {dataset} " \
-                          f"--batch_size 4000 " \
+                          f"--batch_size 512 " \
                           f"--patience 5 " \
                           f"--m_step_patience 5 " \
                           f"--validation_split 0.2 " \

@@ -92,6 +92,7 @@ class DistributionTrainer:
         early_stopping = 0
         start = time.time()
         for epoch in (pbar := tqdm(range(epochs), **(tqdm_kwargs if tqdm_kwargs is not None else {}))):
+            self.epoch = epoch
             loss_train_per_epoch = AvgMeter()
             batched_sample_weights_train_iterator = None
             if batched_dataset_sample_weights_train is not None:

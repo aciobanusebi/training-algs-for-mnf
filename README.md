@@ -6,29 +6,30 @@
 
 # Table of contents
 
-- [Training Algorithms for Mixtures of Normalizing Flows](#training-algorithms-for-mixtures-of-normalizing-flows)
-  - [Important Warning](#important-warning)
-  - [Install requirements](#install-requirements)
-  - [Training algorithms for probabilistic distributions: sample code](#training-algorithms-for-probabilistic-distributions-sample-code)
-    - [Normal distribution](#normal-distribution)
-      - [via tfd.Distribution.experimental_fit](#via-tfddistributionexperimental_fit)
-      - [via our code: gradient descent](#via-our-code-gradient-descent)
-    - [Mixture of normal distributions](#mixture-of-normal-distributions)
-      - [via our code: gradient descent](#via-our-code-gradient-descent)
-      - [via our code: hard EM](#via-our-code-hard-em)
-      - [via our code: soft EM](#via-our-code-soft-em)
-      - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
-    - [Mixture of normalizing flows](#mixture-of-normalizing-flows)
-      - [via our code: gradient descent](#via-our-code-gradient-descent)
-      - [via our code: hard EM](#via-our-code-hard-em)
-      - [via our code: soft EM](#via-our-code-soft-em)
-      - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
-      - [via our code: gradient descent (create the `distribution` object using our own classes)](#via-our-code-gradient-descent-create-the-distribution-object-using-our-own-classes)
-  - [Mixture of normalizing flows: How to run the scripts](#mixture-of-normalizing-flows-how-to-run-the-scripts)
-    - [Training](#training)
-    - [Evaluation](#evaluation)
-    - [Run all the experiments](#run-all-the-experiments)
-    - [Process the experiments' results](#process-the-experiments-results)
+# Table of contents
+
+- [Important Warning](#important-warning)
+- [Install requirements](#install-requirements)
+- [Training algorithms for probabilistic distributions: sample code](#training-algorithms-for-probabilistic-distributions-sample-code)
+  - [Normal distribution](#normal-distribution)
+    - [via tfd.Distribution.experimental_fit](#via-tfddistributionexperimental_fit)
+    - [via our code: gradient descent](#via-our-code-gradient-descent)
+  - [Mixture of normal distributions](#mixture-of-normal-distributions)
+    - [via our code: gradient descent](#via-our-code-gradient-descent)
+    - [via our code: hard EM](#via-our-code-hard-em)
+    - [via our code: soft EM](#via-our-code-soft-em)
+    - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
+  - [Mixture of normalizing flows (1 block)](#mixture-of-normalizing-flows-1-block)
+    - [via our code: gradient descent](#via-our-code-gradient-descent)
+    - [via our code: hard EM](#via-our-code-hard-em)
+    - [via our code: soft EM](#via-our-code-soft-em)
+    - [via our code: variational gradient descent](#via-our-code-variational-gradient-descent)
+    - [via our code: gradient descent (create the `distribution` object using our own classes)](#via-our-code-gradient-descent-create-the-distribution-object-using-our-own-classes)
+- [Mixture of normalizing flows: How to run the scripts](#mixture-of-normalizing-flows-how-to-run-the-scripts)
+  - [Training](#training)
+  - [Evaluation](#evaluation)
+  - [Run all the experiments](#run-all-the-experiments)
+  - [Process the experiments' results](#process-the-experiments-results)
 
 ## Important Warning
 
@@ -247,7 +248,11 @@ print(VariationalMixturePredictor(encoder).predict_proba(tf.convert_to_tensor([1
 
 ```
 
-### Mixture of normalizing flows
+### Mixture of normalizing flows (1 block)
+
+The following examples use just **one block**/flow (i.e. no chained flows). For more blocks, use `tfb.Chain` or set
+our `number_of_blocks` parameter in the constructor of `BijectorMaskedAutoregressiveFlowCreator` to a number greater
+than 1 (see the last example).
 
 #### via our code: gradient descent
 
@@ -459,28 +464,30 @@ tfd = tfp.distributions
 tfb = tfp.bijectors
 
 distribution = MixtureOfNormalizingFlowsCreator(
-    dtype="float32",
-    normalizing_flow_creators=[
-        NormalizingFlowCreator(
-            base_distribution_creator=BaseMultivariateNormalDiagCreator(
-                dimensionality=1,
-                dtype="float32",
-                scale=1.0
-            ),
-          bijector_creator=BijectorMaskedAutoregressiveFlowCreator(
-            dtype="float32",
-            hidden_units=[5],
-                activation=None
-            )
-        )
-        for _ in range(2)],
-    trainable_categorical_logits=True
+  dtype="float32",
+  normalizing_flow_creators=[
+    NormalizingFlowCreator(
+      base_distribution_creator=BaseMultivariateNormalDiagCreator(
+        dimensionality=1,
+        dtype="float32",
+        scale=1.0
+      ),
+      bijector_creator=BijectorMaskedAutoregressiveFlowCreator(
+        dtype="float32",
+        hidden_units=[5],
+        activation=None,
+        number_of_blocks=1
+        # for more expressiveness, set a higher number of blocks, which will be chained via tfb.Chain
+      )
+    )
+    for _ in range(2)],
+  trainable_categorical_logits=True
 ).create()
 
 DistributionTrainer(distribution).fit_via_gd(
-    batched_dataset_train=tf.data.Dataset.from_tensor_slices([[1.0], [2.0], [3.0]]).batch(3),
-    optimizer=tf.optimizers.Adam(learning_rate=0.1),
-    epochs=100)
+  batched_dataset_train=tf.data.Dataset.from_tensor_slices([[1.0], [2.0], [3.0]]).batch(3),
+  optimizer=tf.optimizers.Adam(learning_rate=0.1),
+  epochs=100)
 
 print(distribution.trainable_variables)
 
@@ -504,7 +511,7 @@ python -m tools.gd_em.train --algorithm gd --dataset_name two_banana
 Call with all the arguments:
 
 ```
-python -m tools.gd_em.train --algorithm em_soft --maf_hidden_units 10 4 --maf_activation tanh --prior_trainable True --encoder_hidden_units 10 --encoder_activations relu --learning_rate 0.001 --epochs 10 --m_step_epochs 10 --dataset_name two_banana --batch_size 32 --patience 10 --m_step_patience 10 --validation_split 0.2 --e_step_cache_directory tmp --output_directory artifacts --dtype float32 --seed 11 --suppress_warnings False
+python -m tools.gd_em.train --algorithm em_soft --maf_hidden_units 10 4 --maf_activation tanh --maf_number_of_blocks 2 --prior_trainable True --encoder_hidden_units 10 --encoder_activations relu --encoder_temperature_decay_steps 1 --encoder_temperature_decay_rate 0.96 --encoder_temperature_initial_rate 10000 --learning_rate 0.001 --epochs 10 --m_step_epochs 10 --dataset_name two_banana --batch_size 32 --patience 10 --m_step_patience 10 --validation_split 0.2 --e_step_cache_directory tmp --output_directory artifacts --dtype float32 --seed 11 --suppress_warnings False
 ```
 
 ### Evaluation

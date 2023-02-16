@@ -9,13 +9,13 @@ class BaseMultivariateNormalDiagCreator:
                  dimensionality,
                  dtype,
                  mean=None,
-                 min_random=0,
-                 max_random=1,
-                 scale=0.1):
+                 loc_init_mean=0.0,
+                 loc_init_stddev=1.0,
+                 scale=1.0):
         self.dimensionality = dimensionality
         self.dtype = dtype
         self.mean = mean
-        self.base_distributions_loc_init = tf.random_uniform_initializer(min_random, max_random)
+        self.base_distributions_loc_init = tf.random_normal_initializer(mean=loc_init_mean, stddev=loc_init_stddev)
         self.base_distributions_scale_diag_init = tf.constant_initializer(scale)
 
     def create(self):

@@ -27,7 +27,9 @@ distribution = MixtureOfNormalizingFlowsCreator(
             bijector_creator=BijectorMaskedAutoregressiveFlowCreator(
                 dtype="float32",
                 hidden_units=[5],
-                activation=None
+                activation=None,
+                number_of_blocks=1
+                # for more expressiveness, set a higher number of blocks, which will be chained via tfb.Chain
             )
         )
         for _ in range(2)],

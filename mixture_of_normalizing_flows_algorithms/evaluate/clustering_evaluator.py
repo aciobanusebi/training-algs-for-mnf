@@ -82,8 +82,9 @@ class ClusteringEvaluator:
         X = X.T
         y = y[np.newaxis, ...]
         # Set min and max values and give it some padding
-        x_min, x_max = -0.25, 1.25
-        y_min, y_max = -0.25, 1.25
+        padding = 0.25
+        x_min, x_max = min(X.T[:, 0]) - padding, max(X.T[:, 0]) + padding  # -0.25, 1.25
+        y_min, y_max = min(X.T[:, 1]) - padding, max(X.T[:, 1]) + padding  # -0.25, 1.25
         h = 0.01
         # Generate a grid of points with distance h between them
         xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))

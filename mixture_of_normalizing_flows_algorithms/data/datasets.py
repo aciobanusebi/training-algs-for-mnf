@@ -3,6 +3,7 @@ class Datasets:
     def news20():
         from sklearn.datasets import fetch_20newsgroups
         from sklearn.feature_extraction.text import TfidfVectorizer
+        import numpy as np
 
         _20news = fetch_20newsgroups(subset="all")
         data = _20news.data
@@ -10,7 +11,8 @@ class Datasets:
 
         vectorizer = TfidfVectorizer(max_features=2000)
         data = vectorizer.fit_transform(data)
-        data = data.toarray()
+        data = data.toarray().astype(np.float32)
+        # data = StandardScaler().fit_transform(data).astype(np.float32)
 
         return data, target
 
@@ -27,6 +29,7 @@ class Datasets:
         real_labels = y_train
 
         samples = (x_train.reshape((x_train.shape[0], -1)) / 255.).astype(np.float32)
+        # samples = StandardScaler().fit_transform(samples).astype(np.float32)
 
         return samples, real_labels
 
@@ -44,6 +47,7 @@ class Datasets:
         real_labels = y_train
 
         samples = (x_train.reshape((x_train.shape[0], -1)) / 255.).astype(np.float32)
+        # samples = StandardScaler().fit_transform(samples).astype(np.float32)
 
         return samples, real_labels
 
@@ -64,6 +68,7 @@ class Datasets:
         real_labels = y_train
 
         samples = (x_train.reshape((x_train.shape[0], -1)) / 255.).astype(np.float32)
+        # samples = StandardScaler().fit_transform(samples).astype(np.float32)
 
         return samples, real_labels
 
@@ -80,6 +85,7 @@ class Datasets:
         real_labels = y_train
 
         samples = (x_train.reshape((x_train.shape[0], -1)) / 255.).astype(np.float32)
+        # samples = StandardScaler().fit_transform(samples).astype(np.float32)
 
         return samples, real_labels
 
@@ -98,15 +104,16 @@ class Datasets:
 
         samples = np.concatenate((X_tr, X_te))
         real_labels = np.concatenate((y_tr, y_te))
-        return samples, real_labels
+        # samples = StandardScaler().fit_transform(samples).astype(np.float32)
+        return samples.astype(np.float32), real_labels
 
-    @staticmethod
-    def __rescale_columns(data):
-        for i in range(data.shape[1]):
-            mmin = min(data[:, i])
-            mmax = max(data[:, i])
-            data[:, i] = (data[:, i] - mmin) / (mmax - mmin)
-        return data
+    # @staticmethod
+    # def __rescale_columns(data):
+    #     for i in range(data.shape[1]):
+    #         mmin = min(data[:, i])
+    #         mmax = max(data[:, i])
+    #         data[:, i] = (data[:, i] - mmin) / (mmax - mmin)
+    #     return data
 
     @staticmethod
     def two_banana():
@@ -122,11 +129,12 @@ class Datasets:
         x1 = (x1 - min(x1)) / max(x1)
         data = np.stack([x1, x2], axis=-1)
         data = np.concatenate((data, data + 2))
-        data = Datasets.__rescale_columns(data).astype(np.float32)
+        # # data = Datasets.__rescale_columns(data).astype(np.float32)
+        # data = StandardScaler().fit_transform(data).astype(np.float32)
         labels = np.array([0 for _ in range(len(x1))] + [1 for _ in range(len(x2))])
         np.random.seed(None)
 
-        return data, labels
+        return data.astype(np.float32), labels
 
     @staticmethod
     def smile(path="data/smile.csv"):
@@ -136,7 +144,8 @@ class Datasets:
         data = pandas.read_csv(path).to_numpy().astype(np.float32)
         samples = data[:, :2]
         labels = data[:, 2]
-        samples = Datasets.__rescale_columns(samples)
+        # # samples = Datasets.__rescale_columns(samples)
+        # samples = StandardScaler().fit_transform(samples)
         return samples, labels.astype(np.uint8)
 
     @staticmethod
@@ -147,7 +156,8 @@ class Datasets:
         data = make_moons(1000, noise=0.1)
         samples = data[0].astype(np.float32)
         labels = data[1]
-        samples = Datasets.__rescale_columns(samples)
+        # # samples = Datasets.__rescale_columns(samples)
+        # samples = StandardScaler().fit_transform(samples)
         np.random.seed(None)
 
         return samples, labels
@@ -160,7 +170,8 @@ class Datasets:
         data = make_circles(1000, noise=0.01)
         samples = data[0].astype(np.float32)
         labels = data[1]
-        samples = Datasets.__rescale_columns(samples)
+        # # samples = Datasets.__rescale_columns(samples)
+        # samples = StandardScaler().fit_transform(samples)
         np.random.seed(None)
 
         return samples, labels
@@ -197,6 +208,7 @@ class Datasets:
 
         samples = samples.astype(np.float32)
 
-        samples = Datasets.__rescale_columns(samples)
+        # samples = Datasets.__rescale_columns(samples)
+        # # samples = StandardScaler().fit_transform(samples)
 
         return samples, labels

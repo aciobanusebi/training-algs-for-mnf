@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import tensorflow_probability as tfp
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 from mixture_of_normalizing_flows_algorithms.data.datasets import Datasets
 from mixture_of_normalizing_flows_algorithms.model.creators.base_distributions.base_multivariate_normal_diag_creator import \
@@ -46,11 +47,18 @@ def get_parser():
 
     parser.add_argument('--maf_hidden_units', type=int, nargs="+", default=[10])
     parser.add_argument('--maf_activation', type=str, default="tanh")
+    parser.add_argument('--maf_number_of_blocks', type=int, default=1)
     parser.add_argument('--prior_trainable', type=str2bool, default=True,
                         help="Should the weights of the mixture components be trainable?")
     parser.add_argument('--encoder_hidden_units', type=int, nargs="+", default=[10],
                         help="Hyperparameter for the encoder used in gd_variational: q(z|x)")
     parser.add_argument('--encoder_activations', type=str, nargs="+", default=["relu"],
+                        help="Hyperparameter for the encoder used in gd_variational: q(z|x)")
+    parser.add_argument('--encoder_temperature_decay_steps', type=int, default=1,
+                        help="Hyperparameter for the encoder used in gd_variational: q(z|x)")
+    parser.add_argument('--encoder_temperature_decay_rate', type=float, default=0.96,
+                        help="Hyperparameter for the encoder used in gd_variational: q(z|x)")
+    parser.add_argument('--encoder_temperature_initial_rate', type=float, default=None,
                         help="Hyperparameter for the encoder used in gd_variational: q(z|x)")
 
     parser.add_argument('--learning_rate', type=float, default=0.001)
@@ -106,7 +114,7 @@ if args.algorithm == "gd_variational":
         keras.Input(shape=(input_data_dimensionality,)),
         *[keras.layers.Dense(units, activation=activation) for units, activation in
           zip(args.encoder_hidden_units, args.encoder_activations)],
-        keras.layers.Dense(number_of_clusters, activation='softmax')
+        keras.layers.Dense(number_of_clusters, activation='linear')
     ])
 
 tf.random.set_seed(args.seed)
@@ -120,11 +128,19 @@ with open(f"{output_directory}/logs.txt", "w") as f:
 with open(f"{output_directory}/train_args.pickle", 'wb') as file:
     pickle.dump(args, file)
 
+standard_scaler = StandardScaler()
 if args.validation_split is not None:
     data_train, data_validation = train_test_split(input_data, test_size=args.validation_split, shuffle=True,
                                                    random_state=args.seed)
+    standard_scaler.fit(data_train)
+    data_train = standard_scaler.transform(data_train)
+    data_validation = standard_scaler.transform(data_validation)
 else:
     data_train, data_validation = input_data, None
+    standard_scaler.fit(data_train)
+    data_train = standard_scaler.transform(data_train)
+with open(f"{output_directory}/standard_scaler.pickle", 'wb') as f:
+    pickle.dump(standard_scaler, f)
 
 mnf = MixtureOfNormalizingFlowsCreator(
     dtype=args.dtype,
@@ -135,9 +151,10 @@ mnf = MixtureOfNormalizingFlowsCreator(
                 dtype=args.dtype
             ),
             bijector_creator=BijectorMaskedAutoregressiveFlowCreator(
+                dtype=args.dtype,
                 hidden_units=args.maf_hidden_units,
                 activation=args.maf_activation,
-                dtype=args.dtype
+                number_of_blocks=args.maf_number_of_blocks
             )
         )
         for _ in range(number_of_clusters)],
@@ -185,7 +202,18 @@ elif args.algorithm in ["em_hard", "em_soft"]:
         output_directory=output_directory
     )
 elif args.algorithm == "gd_variational":
-    VariationalMixtureTrainer(mnf, encoder).fit_via_gd(
+    decay_steps = args.encoder_temperature_decay_steps
+    decay_rate = args.encoder_temperature_decay_rate
+    initial_rate = args.encoder_temperature_initial_rate
+    if initial_rate is None:
+        initial_rate = 1 / ((decay_rate / decay_steps) ** args.epochs)
+
+    temperature_scheduler = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate=initial_rate,
+        decay_steps=decay_steps,
+        decay_rate=decay_rate)
+
+    VariationalMixtureTrainer(mnf, encoder, temperature_scheduler).fit_via_gd(
         batched_dataset_train=batched_dataset_train,
         optimizer=optimizer,
         epochs=args.epochs,
@@ -193,9 +221,6 @@ elif args.algorithm == "gd_variational":
         patience=args.patience,
         output_directory=output_directory
     )
-
-    loss = VariationalMixtureTrainer(mnf, encoder)._compute_loss(batched_dataset_train, None)
-    print(loss)
 
 # for batch in batched_dataset_train.take(1):
 #     print(MixturePredictor(mnf).predict_proba(batch))
