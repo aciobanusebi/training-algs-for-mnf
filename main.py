@@ -37,6 +37,10 @@ m_step_epochs = {
     "toy": 10,
     "image": 4
 }
+learning_rate = {
+    "toy": 0.001,
+    "image": 0.0001
+}
 seeds = list(range(5))
 
 dataset_types = ["toy", "image"]
@@ -53,7 +57,7 @@ for dataset_type in dataset_types:
                           f"--prior_trainable True " \
                           f"--encoder_hidden_units {' '.join(map(str, encoder_hidden_units[dataset_type]))} " \
                           f"--encoder_activations {' '.join(encoder_activations[dataset_type])} " \
-                          f"--learning_rate 0.0001 " \
+                          f"--learning_rate f{learning_rate} " \
                           f"--epochs {epochs[dataset_type][algorithm]} " \
                           f"--m_step_epochs {m_step_epochs[dataset_type]} " \
                           f"--dataset_name {dataset} " \
