@@ -123,6 +123,6 @@ for max_col in ["Purity", "ARI", "NMI", "ACC"]:
                                                                             else '' for i in x], idx=idx,
                                                             subset=max_col, axis=1)
 
-processed_result_styled.to_excel(f"{output_directory}/table.xlsx", index=False)
-processed_result_styled.to_latex(f"{output_directory}/table.tex", convert_css=True, environment="table",
+processed_result_styled.to_excel(f"{output_directory}/latex_table.xlsx", index=False)
+processed_result_styled.to_latex(f"{output_directory}/latex_table.tex", convert_css=True, environment="table",
                                  position_float="centering")
