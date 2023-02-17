@@ -531,3 +531,7 @@ This creates a directory called "process_results".
 ```
 python process_results.py
 ```
+
+```
+python process_results_generate_figure.py
+```
