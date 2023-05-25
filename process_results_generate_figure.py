@@ -134,4 +134,4 @@ show_image_list(list_images=plots,
                 grid=False,
                 title_fontsize=15)
 
-plt.savefig("process_results/figure.png", dpi=400)
+plt.savefig("process_results/figure.png", dpi=1200)
